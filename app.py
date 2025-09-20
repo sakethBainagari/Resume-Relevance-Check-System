@@ -25,8 +25,8 @@ class SimpleResumeAnalyzer:
         try:
             import streamlit as st
             self.api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', 'demo_key'))
-        except:
-            # Fallback for when Streamlit is not available (e.g., during testing)
+        except (ImportError, AttributeError):
+            # Fallback for when Streamlit is not available or secrets not accessible
             self.api_key = os.getenv('GEMINI_API_KEY', 'demo_key')
 
         # Initialize Gemini
@@ -426,7 +426,7 @@ def main():
         try:
             import streamlit as st
             default_api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
-        except:
+        except (ImportError, AttributeError):
             default_api_key = os.getenv('GEMINI_API_KEY', '')
 
         # API Key input with option to override
