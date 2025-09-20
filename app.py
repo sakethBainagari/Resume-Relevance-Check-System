@@ -23,10 +23,9 @@ class SimpleResumeAnalyzer:
     def __init__(self):
         # Try to get API key from Streamlit secrets first, then environment variables
         try:
-            import streamlit as st
             self.api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', 'demo_key'))
-        except (ImportError, AttributeError):
-            # Fallback for when Streamlit is not available or secrets not accessible
+        except (AttributeError, KeyError):
+            # Fallback for when Streamlit secrets not accessible
             self.api_key = os.getenv('GEMINI_API_KEY', 'demo_key')
 
         # Initialize Gemini
@@ -110,7 +109,6 @@ class SimpleResumeAnalyzer:
     def batch_analyze(self, resume_files, jd_text: str, use_enhanced: bool = None) -> list:
         """Analyze multiple resumes against a single job description."""
         results = []
-        import streamlit as st
 
         progress_bar = st.progress(0)
 
@@ -424,9 +422,8 @@ def main():
 
         # Load API key from Streamlit secrets or .env
         try:
-            import streamlit as st
             default_api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
-        except (ImportError, AttributeError):
+        except (AttributeError, KeyError):
             default_api_key = os.getenv('GEMINI_API_KEY', '')
 
         # API Key input with option to override
