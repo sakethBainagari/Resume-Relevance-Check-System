@@ -1,0 +1,17 @@
+# Streamlit Configuration for Production
+[server]
+port = 8501
+headless = true
+enableCORS = false
+enableXsrfProtection = true
+maxUploadSize = 200
+maxMessageSize = 200
+enableWebsocketCompression = true
+
+[browser]
+gatherUsageStats = false
+serverAddress = "0.0.0.0"
+
+[theme]
+base = "light"
+primaryColor = "#007bff"
