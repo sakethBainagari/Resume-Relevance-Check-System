@@ -14,16 +14,37 @@ logger = logging.getLogger(__name__)
 class VectorSearchEngine:
     """Vector search engine using ChromaDB and sentence transformers for semantic search."""
 
-    def __init__(self, collection_name: str = "resume_analysis", persist_directory: str = "./chroma_db"):
+import chromadb
+from chromadb.config import Settings
+import numpy as np
+from sentence_transformers import SentenceTransformer
+from typing import List, Dict, Any, Tuple, Optional
+import logging
+import os
+from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class VectorSearchEngine:
+    """Vector search engine using ChromaDB and sentence transformers for semantic search."""
+
+    def __init__(self, collection_name: str = "resume_analysis", persist_directory: str = "./chroma_db", use_persistent: bool = True):
         """Initialize the vector search engine."""
         self.collection_name = collection_name
         self.persist_directory = persist_directory
+        self.use_persistent = use_persistent
 
-        # Ensure persist directory exists
-        os.makedirs(persist_directory, exist_ok=True)
-
-        # Initialize ChromaDB client
-        self.client = chromadb.PersistentClient(path=persist_directory)
+        # For Streamlit Cloud, use in-memory storage
+        if not use_persistent:
+            logger.info("Using in-memory ChromaDB for Streamlit Cloud compatibility")
+            self.client = chromadb.EphemeralClient()
+        else:
+            # Ensure persist directory exists for local development
+            os.makedirs(persist_directory, exist_ok=True)
+            # Initialize ChromaDB client
+            self.client = chromadb.PersistentClient(path=persist_directory)
 
         # Initialize sentence transformer model
         try:

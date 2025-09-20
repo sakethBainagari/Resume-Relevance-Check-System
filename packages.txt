@@ -1,0 +1,14 @@
+# System-level dependencies for Streamlit Cloud
+# These are installed at the system level before Python packages
+
+# For PDF processing
+poppler-utils
+
+# For general system utilities
+curl
+
+# For compression/decompression (used by some Python packages)
+zlib1g-dev
+
+# For SSL/TLS support
+openssl

@@ -13,15 +13,21 @@ logger = logging.getLogger(__name__)
 class ResumeDatabase:
     """SQLite database for storing resume analysis results and metadata."""
 
-    def __init__(self, db_path: str = "resume_analysis.db"):
+    def __init__(self, db_path: str = "resume_analysis.db", use_memory: bool = False):
         """Initialize database connection."""
         self.db_path = db_path
+        self.use_memory = use_memory
         self.init_database()
 
     @contextmanager
     def get_connection(self):
         """Context manager for database connections."""
-        conn = sqlite3.connect(self.db_path)
+        if self.use_memory:
+            # Use in-memory database for Streamlit Cloud
+            conn = sqlite3.connect(":memory:")
+        else:
+            conn = sqlite3.connect(self.db_path)
+
         conn.row_factory = sqlite3.Row
         try:
             yield conn

@@ -8,10 +8,27 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
+def is_cloud_environment():
+    """Detect if running in a cloud environment (Streamlit Cloud, etc.)"""
+    # Check for Streamlit Cloud specific environment variables
+    cloud_indicators = [
+        'STREAMLIT_SERVER_HEADLESS',  # Streamlit Cloud
+        'STREAMLIT_CLOUD',           # Custom indicator
+        os.getenv('STREAMLIT_RUNTIME')  # Another indicator
+    ]
+    return any(cloud_indicators)
+
 # Simple fallback analyzer for now
 class SimpleResumeAnalyzer:
     def __init__(self):
-        self.api_key = os.getenv('GEMINI_API_KEY', 'demo_key')
+        # Try to get API key from Streamlit secrets first, then environment variables
+        try:
+            import streamlit as st
+            self.api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', 'demo_key'))
+        except:
+            # Fallback for when Streamlit is not available (e.g., during testing)
+            self.api_key = os.getenv('GEMINI_API_KEY', 'demo_key')
+
         # Initialize Gemini
         if self.api_key and self.api_key != 'demo_key':
             try:
@@ -381,6 +398,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 def main():
+    # Check if running in cloud environment
+    cloud_env = is_cloud_environment()
+
+    if cloud_env:
+        st.info("🌐 Running in cloud environment - using optimized settings for better performance")
+
     # Header
     st.markdown("""
     <div class="main-header">
@@ -399,8 +422,12 @@ def main():
     with st.sidebar:
         st.header("🔧 Configuration")
 
-        # Load API key from .env
-        default_api_key = os.getenv('GEMINI_API_KEY', '')
+        # Load API key from Streamlit secrets or .env
+        try:
+            import streamlit as st
+            default_api_key = st.secrets.get('GEMINI_API_KEY', os.getenv('GEMINI_API_KEY', ''))
+        except:
+            default_api_key = os.getenv('GEMINI_API_KEY', '')
 
         # API Key input with option to override
         use_custom_key = st.checkbox("🔑 Use Custom API Key", help="Check this to enter your own API key instead of using the built-in one")
